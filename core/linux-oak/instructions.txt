@@ -1,0 +1,63 @@
+use uname to get the current chrome kernel version.
+use that version to build. this will create a fresh kernel that still supports chromeos binaries
+
+sudo crouton -r buster -n kernel -t core
+
+
+IN CHOMEOS (not as root!):
+sudo modprobe configs
+cat /proc/config.gz | gunzip > ~/Downloads/base.config
+sed -i 's/.*CONFIG_LOCALVERSION=.*/CONFIG_LOCALVERSION="-19095-g86596f58eadf"/' ~/Downloads/base.config
+cp -rL /lib/firmware ~/Downloads/
+
+INSIDE DEBIAN CHROOT:
+apt-get install -y git build-essential u-boot-tools vboot-kernel-utils bc debootstrap qemu-user-static
+cd /opt
+wget https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
+mkdir kernel
+tar zxfp 86596f58eadf.tar.gz -C kernel/
+cd kernel
+wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/log2.patch
+patch < log2.patch
+cp /home/daniele/Downloads/base.config .config
+wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/config_append_to_chromeos.txt
+cat config_append_to_chromeos.txt >> .config
+cp include/linux/compiler-gcc5.h include/linux/compiler-gcc8.h
+make oldconfig
+make prepare
+make -j4 Image
+make -j4 modules
+make dtbs
+mkdir -p "/opt/root/"/{lib/modules,lib/firmware}
+make INSTALL_MOD_PATH="/opt/root" modules_install
+make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
+wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/kernel.its
+mkimage -D "-I dts -O dtb -p 2048" -f kernel.its vmlinux.uimg
+dd if=/dev/zero of=bootloader.bin bs=512 count=1
+wget https://github.com/buzzy/PKGBUILDs/raw/master/core/linux-oak/kernel.keyblock
+wget https://github.com/buzzy/PKGBUILDs/raw/master/core/linux-oak/kernel_data_key.vbprivk
+echo "console=tty1 init=/sbin/init root=PARTUUID=%U/PARTNROFF=1 rootwait rw noinitrd" > cmdline
+vbutil_kernel --pack vmlinux.kpart --version 1 --vmlinuz vmlinux.uimg --arch aarch64 --keyblock kernel.keyblock --signprivate kernel_data_key.vbprivk --config cmdline --bootloader bootloader.bin
+cp vmlinux.kpart /opt/root/boot/
+rm -f /opt/root/lib/modules/*/{source,build}
+rm -rf /opt/root/lib/firmware
+cp -rv /home/daniele/Downloads/firmware /opt/root/lib/
+
+CREATE USB DRIVE
+fdisk /dev/sda
+press g, press w
+cgpt create /dev/sda
+cgpt add -i 1 -t kernel -b 8192 -s 65536 -l Kernel -S 1 -T 5 -P 10 /dev/sda
+cgpt show /dev/sda
+cgpt add -i 2 -t data -b 73728 -s `expr xxxxx - 73728` -l Root /dev/sda
+partx /dev/sda
+
+dd if=/opt/root/boot/vmlinux.kpart of=/dev/sda1
+mkfs.ext4 /dev/sda2
+mkdir /tmp/root
+mount /dev/sda2 /tmp/root
+qemu-debootstrap --arch armhf buster /tmp/root http://deb.debian.org/debian/
+cp -r /opt/root/boot/* /tmp/root/boot/
+cp -r /opt/root/lib/* /tmp/root/usr/lib/
+umount /tmp/root
+
