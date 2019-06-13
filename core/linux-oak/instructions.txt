@@ -1,13 +1,15 @@
 If using Debian buster:
 apt-get install gcc-8-aarch64-linux-gnu
 ln -s /usr/bin/aarch64-linux-gnu-gcc-8 /usr/bin/aarch64-linux-gnu-gcc
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- clean
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- oldconfig
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- prepare
-make -j6 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH="/opt/root" modules_install
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
-make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_HDR_PATH=/opt/root/usr headers_install
+export ARCH=arm64
+export CROSS_COMPILE=aarch64-linux-gnu-
+make clean
+make oldconfig
+make prepare
+make -j6 Image modules dtbs
+make INSTALL_MOD_PATH="/opt/root" modules_install
+make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
+make INSTALL_HDR_PATH=/opt/root/usr headers_install
 find /opt/root/usr/include \( -name .install -o -name ..install.cmd \) -delete
 
 use uname to get the current chrome kernel version.
