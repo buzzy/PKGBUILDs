@@ -22,6 +22,10 @@ make menuconfig
 make
 make install
 
+mkdir sys
+mkdir dev/pts
+mkdir dev/shm
+
 
 use uname to get the current chrome kernel version.
 use that version to build. this will create a fresh kernel that still supports chromeos binaries
