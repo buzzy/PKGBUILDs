@@ -18,7 +18,7 @@ mkdir kernel
 tar zxfp 86596f58eadf.tar.gz -C kernel/
 cd kernel
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/log2.patch
-patch < log2.patch
+patch -p1 < log2.patch
 cp /home/daniele/Downloads/base.config .config
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/config_append_to_chromeos.txt
 cat config_append_to_chromeos.txt >> .config
