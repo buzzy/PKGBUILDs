@@ -1,6 +1,7 @@
 If using Debian buster:
 apt-get install gcc-8-aarch64-linux-gnu
 ln -s /usr/bin/aarch64-linux-gnu-gcc-8 /usr/bin/aarch64-linux-gnu-gcc
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- clean
 make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- oldconfig
 make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- prepare
 make -j6 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
