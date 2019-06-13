@@ -1,4 +1,5 @@
 If using Debian buster:
+KERNEL:
 apt-get install gcc-8-aarch64-linux-gnu gcc-8-arm-linux-gnueabihf
 ln -s /usr/bin/aarch64-linux-gnu-gcc-8 /usr/bin/aarch64-linux-gnu-gcc
 ln -s /usr/bin/arm-linux-gnueabihf-gcc-8 /usr/bin/arm-linux-gnueabihf-gcc
@@ -12,6 +13,15 @@ make INSTALL_MOD_PATH="/opt/root" modules_install
 make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
 make INSTALL_HDR_PATH=/opt/root/usr headers_install
 find /opt/root/usr/include \( -name .install -o -name ..install.cmd \) -delete
+
+BUSYBOX:
+export ARCH=arm
+export CROSS_COMPILE=arm-linux-gnueabihf-
+make defconfig
+make menuconfig
+make
+
+
 
 use uname to get the current chrome kernel version.
 use that version to build. this will create a fresh kernel that still supports chromeos binaries
