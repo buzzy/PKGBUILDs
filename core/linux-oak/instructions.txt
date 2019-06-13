@@ -20,7 +20,7 @@ export CROSS_COMPILE=arm-linux-gnueabihf-
 make defconfig
 make menuconfig
 make
-
+make install
 
 
 use uname to get the current chrome kernel version.
