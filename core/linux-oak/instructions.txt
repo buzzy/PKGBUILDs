@@ -1,6 +1,6 @@
 If using Debian buster:
 KERNEL:
-apt-get install gcc-8-aarch64-linux-gnu gcc-8-arm-linux-gnueabihf
+apt-get install gcc-8-aarch64-linux-gnu gcc-8-arm-linux-gnueabihf gawk bison
 ln -s /usr/bin/aarch64-linux-gnu-gcc-8 /usr/bin/aarch64-linux-gnu-gcc
 ln -s /usr/bin/arm-linux-gnueabihf-gcc-8 /usr/bin/arm-linux-gnueabihf-gcc
 export ARCH=arm64
@@ -25,6 +25,15 @@ make install
 mkdir sys
 mkdir dev/pts
 mkdir dev/shm
+
+GCC:
+wget http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-9.1.0/gcc-9.1.0.tar.gz
+
+GLIBC:
+wget http://ftp.gnu.org/gnu/glibc/glibc-2.29.tar.bz2
+mkdir build
+../configure
+
 
 
 use uname to get the current chrome kernel version.
