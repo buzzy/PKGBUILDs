@@ -25,7 +25,10 @@ make dtbs
 make INSTALL_MOD_PATH="/opt/sysroot" modules_install
 make INSTALL_DTBS_PATH="/opt/sysroot/boot/dtbs" dtbs_install
 make INSTALL_HDR_PATH=/opt/sysroot/usr headers_install
-find /opt/root/usr/include \( -name .install -o -name ..install.cmd \) -delete
+find /opt/sysroot/usr/include \( -name .install -o -name ..install.cmd \) -delete
+rm -f /opt/sysroot/lib/modules/*/{source,build}
+#copy firmware and other crap from chromeos
+
 
 BUSYBOX:
 export ARCH=arm
@@ -84,6 +87,7 @@ make dtbs
 #mkdir -p "/opt/root/"/{lib/modules,lib/firmware}
 make INSTALL_MOD_PATH="/opt/root" modules_install
 make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
+
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/kernel.its
 mkimage -D "-I dts -O dtb -p 2048" -f kernel.its vmlinux.uimg
 dd if=/dev/zero of=bootloader.bin bs=512 count=1
