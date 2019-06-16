@@ -16,12 +16,13 @@ patch -p1 < log2.patch
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/config.chromeos
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/config_append_to_chromeos.txt
 cat config.chromeos config_append_to_chromeos.txt > .config
+cp include/linux/compiler-gcc5.h include/linux/compiler-gcc8.h
 make oldconfig
 make prepare
-make -j6 Image modules dtbs
-make INSTALL_MOD_PATH="/opt/root" modules_install
-make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
-make INSTALL_HDR_PATH=/opt/root/usr headers_install
+make -j$(nproc) Image modules dtbs
+make INSTALL_MOD_PATH="/opt/sysroot" modules_install
+make INSTALL_DTBS_PATH="/opt/sysroot/boot/dtbs" dtbs_install
+make INSTALL_HDR_PATH=/opt/sysroot/usr headers_install
 find /opt/root/usr/include \( -name .install -o -name ..install.cmd \) -delete
 
 BUSYBOX:
