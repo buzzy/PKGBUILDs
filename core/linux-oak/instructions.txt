@@ -65,6 +65,7 @@ mkdir -p .build/src
 ln -s /opt/kernel .build/src/linux-3.18.134
 touch .build/src/.linux-3.18.134.extracted
 touch .build/src/.linux-3.18.134.patched
+touch .build/tarballs/linux-3.18.134.tar.xz
 ./ct-ng build
 
 #CHROMEOS BINARIES
