@@ -1,10 +1,19 @@
 If using Debian buster:
 KERNEL:
-apt-get install gcc-8-aarch64-linux-gnu gcc-8-arm-linux-gnueabihf gawk bison
+apt-get update
+apt-get install -y gcc-8-aarch64-linux-gnu gcc-8-arm-linux-gnueabihf gawk bison wget patch
 ln -s /usr/bin/aarch64-linux-gnu-gcc-8 /usr/bin/aarch64-linux-gnu-gcc
 ln -s /usr/bin/arm-linux-gnueabihf-gcc-8 /usr/bin/arm-linux-gnueabihf-gcc
+mkdir /opt/sysroot
 export ARCH=arm64
 export CROSS_COMPILE=aarch64-linux-gnu-
+wget -O /opt/kernel.tar.gz https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
+mkdir /opt/kernel
+tar xfv /opt/kernel.tar.gz -C /opt/kernel
+cd /opt/kernel
+wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/log2.patch
+patch -p1 < log2.patch
+
 make clean
 make oldconfig
 make prepare
@@ -53,7 +62,7 @@ cp -rL /lib/firmware ~/Downloads/
 INSIDE DEBIAN CHROOT:
 apt-get install -y git build-essential u-boot-tools vboot-kernel-utils bc debootstrap qemu-user-static
 cd /opt
-wget https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
+wget -O /opt/kernel.tar.gz https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
 mkdir kernel
 tar zxfp 86596f58eadf.tar.gz -C kernel/
 cd kernel
