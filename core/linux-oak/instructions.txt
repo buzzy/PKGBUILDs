@@ -1,3 +1,52 @@
+If using Debian buster:
+KERNEL:
+apt-get update
+apt-get install -y gcc-8-aarch64-linux-gnu gcc-8-arm-linux-gnueabihf gawk bison wget patch
+ln -s /usr/bin/aarch64-linux-gnu-gcc-8 /usr/bin/aarch64-linux-gnu-gcc
+ln -s /usr/bin/arm-linux-gnueabihf-gcc-8 /usr/bin/arm-linux-gnueabihf-gcc
+mkdir /opt/sysroot
+export ARCH=arm64
+export CROSS_COMPILE=aarch64-linux-gnu-
+wget -O /opt/kernel.tar.gz https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
+mkdir /opt/kernel
+tar xfv /opt/kernel.tar.gz -C /opt/kernel
+cd /opt/kernel
+wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/log2.patch
+patch -p1 < log2.patch
+
+make clean
+make oldconfig
+make prepare
+make -j6 Image modules dtbs
+make INSTALL_MOD_PATH="/opt/root" modules_install
+make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
+make INSTALL_HDR_PATH=/opt/root/usr headers_install
+find /opt/root/usr/include \( -name .install -o -name ..install.cmd \) -delete
+
+BUSYBOX:
+export ARCH=arm
+export CROSS_COMPILE=arm-linux-gnueabihf-
+make defconfig
+make menuconfig
+make
+make install
+
+mkdir sys
+mkdir dev/pts
+mkdir dev/shm
+
+GCC:
+wget http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-9.1.0/gcc-9.1.0.tar.gz
+./contrib/download_prerequisites
+./configure --target=arm-linux  --prefix=/opt/toolchain --disable-nls --disable-shared --disable-multilib --disable-decimal-float --disable-threads --disable-libmudflap --disable-libssp --disable-libgomp --enable-languages=c
+
+GLIBC:
+wget http://ftp.gnu.org/gnu/glibc/glibc-2.29.tar.bz2
+mkdir build
+../configure
+
+
+
 use uname to get the current chrome kernel version.
 use that version to build. this will create a fresh kernel that still supports chromeos binaries
 
@@ -13,12 +62,12 @@ cp -rL /lib/firmware ~/Downloads/
 INSIDE DEBIAN CHROOT:
 apt-get install -y git build-essential u-boot-tools vboot-kernel-utils bc debootstrap qemu-user-static
 cd /opt
-wget https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
+wget -O /opt/kernel.tar.gz https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/86596f58eadf.tar.gz
 mkdir kernel
 tar zxfp 86596f58eadf.tar.gz -C kernel/
 cd kernel
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/log2.patch
-patch < log2.patch
+patch -p1 < log2.patch
 cp /home/daniele/Downloads/base.config .config
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/config_append_to_chromeos.txt
 cat config_append_to_chromeos.txt >> .config
@@ -28,7 +77,7 @@ make prepare
 make -j4 Image
 make -j4 modules
 make dtbs
-mkdir -p "/opt/root/"/{lib/modules,lib/firmware}
+#mkdir -p "/opt/root/"/{lib/modules,lib/firmware}
 make INSTALL_MOD_PATH="/opt/root" modules_install
 make INSTALL_DTBS_PATH="/opt/root/boot/dtbs" dtbs_install
 wget https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/kernel.its
