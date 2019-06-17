@@ -67,6 +67,8 @@ touch .build/src/.linux-3.18.134.extracted
 touch .build/src/.linux-3.18.134.patched
 touch .build/tarballs/linux-3.18.134.tar.xz
 ./ct-ng build
+cp -rv ~/x-tools/HOST-arm-linux-gnueabihf/arm-linux-gnueabihf/arm-linux-gnueabihf/sysroot/* /opt/sysroot/
+
 
 #CHROMEOS BINARIES
 #copy firmware and other crap from chromeos
