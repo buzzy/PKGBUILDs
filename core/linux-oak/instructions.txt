@@ -1,4 +1,6 @@
 If using Debian buster:
+wget -O /tmp/script.sh http://...
+docker run -v /tmp/script.sh:/script.sh --mount type=bind,source=/opt/sysroot,target=/opt/sysroot --rm debian:buster bash script.sh
 
 #KERNEL:
 apt-get update
@@ -34,7 +36,8 @@ mkimage -D "-I dts -O dtb -p 2048" -f kernel.its vmlinux.uimg
 dd if=/dev/zero of=bootloader.bin bs=512 count=1
 wget https://github.com/buzzy/PKGBUILDs/raw/master/core/linux-oak/kernel.keyblock
 wget https://github.com/buzzy/PKGBUILDs/raw/master/core/linux-oak/kernel_data_key.vbprivk
-echo "console=tty1 init=/sbin/init root=PARTUUID=%U/PARTNROFF=1 rootwait rw noinitrd quiet loglevel=0" > cmdline
+#echo "console=tty1 init=/sbin/init root=PARTUUID=%U/PARTNROFF=1 rootwait rw noinitrd quiet loglevel=0" > cmdline
+echo "console=tty1 init=/sbin/init root=PARTUUID=%U/PARTNROFF=1 rootwait rw noinitrd" > cmdline
 vbutil_kernel --pack vmlinux.kpart --version 1 --vmlinuz vmlinux.uimg --arch aarch64 --keyblock kernel.keyblock --signprivate kernel_data_key.vbprivk --config cmdline --bootloader bootloader.bin
 cp vmlinux.kpart /opt/sysroot/boot/
 
@@ -53,6 +56,8 @@ unlink /opt/sysroot/linuxrc
 mkdir /opt/sysroot/sys
 mkdir -p /opt/sysroot/dev/pts
 mkdir /opt/sysroot/dev/shm
+mkdir /opt/sysroot/tmp
+chmod 1777 /opt/sysroot/tmp
 
 #CROSSTOOL-NG:
 wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.24.0.tar.xz
@@ -69,9 +74,10 @@ touch .build/tarballs/linux-3.18.134.tar.xz
 ./ct-ng build
 cp -rv ~/x-tools/HOST-arm-linux-gnueabihf/arm-linux-gnueabihf/arm-linux-gnueabihf/sysroot/* /opt/sysroot/
 
-
 #CHROMEOS BINARIES
-#copy firmware and other crap from chromeos
+mkdir /opt/sysroot/temporary
+cp -rv ~/x-tools/* /opt/sysroot/temporary/
+
 
 
 
