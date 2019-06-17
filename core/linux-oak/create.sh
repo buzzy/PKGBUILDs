@@ -67,6 +67,7 @@ cd crosstool-ng-1.24.0
 make
 wget -O .config https://raw.githubusercontent.com/buzzy/PKGBUILDs/master/core/linux-oak/config.crosstool
 mkdir -p .build/src
+#make crosstool use the kernel in /opt/kernel .. bellow does NOT seem to work!
 ln -s /opt/kernel .build/src/linux-3.18.134
 touch .build/src/.linux-3.18.134.extracted
 touch .build/src/.linux-3.18.134.patched
